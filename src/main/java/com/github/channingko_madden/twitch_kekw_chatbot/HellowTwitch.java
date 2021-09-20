@@ -1,5 +1,7 @@
 package com.github.channingko_madden.twitch_kekw_chatbot;
 
+import com.github.channingko_madden.twitch_kekw_chatbot.gui.StartGui;
+
 /*
  * Main class
  * 
@@ -22,7 +24,8 @@ public class HellowTwitch
 		}
 		else
 		{
-			final TwitchSocket testSocket = new TwitchSocket(args[0], args[1], args[2]);
+			StartGui gui = new StartGui();
+			//final TwitchSocket testSocket = new TwitchSocket(args[0], args[1], args[2]);
 		}
 	}
 

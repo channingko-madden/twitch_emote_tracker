@@ -223,7 +223,7 @@ public class TwitchSocket
 		{
 			// Want to parse PRIVMSG only for KEKW. Format looks like: twitch_lurker:!twitch_lurker@twitch_lurker.tmi.twitch.tv PRIVMSG #channel_name :EZ Clap!
 			final int privmsg_pos = message.indexOf("PRIVMSG");
-			if(privmsg_pos != -1)
+			if (privmsg_pos != -1)
 			{
 				final int colon_pos = message.indexOf(':', privmsg_pos + "PRIVMSG".length());
 				if(colon_pos != -1) // might not be necessary
