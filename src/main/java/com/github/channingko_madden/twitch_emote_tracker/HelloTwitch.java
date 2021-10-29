@@ -57,7 +57,6 @@ public class HelloTwitch {
 		mTheFrame.setBounds(50, 50, 300, 300);
 		mTheFrame.pack();
 		mTheFrame.setVisible(true);
-		
 	}
 	
 	
