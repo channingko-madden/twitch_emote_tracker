@@ -1,4 +1,4 @@
-package com.github.channingko_madden.twitch_kekw_chatbot;
+package com.github.channingko_madden.twitch_emote_tracker;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -38,6 +38,9 @@ public class TwitchSocket {
 	final private List<EmoteValue> mEmoteValues;
 	/** Flag to flip when a unique chat message is created, so the next one created is also unique. */
 	private boolean mNeedUniqueMsg = false; 
+	
+	private Thread mReadThread;
+	private Thread mProcessThread;
 
 	/**
 	 * Constructor
@@ -53,11 +56,32 @@ public class TwitchSocket {
 		this.mToken = token;
 		mEmoteValues = emotes;
 		setUpNetworking();
-		Thread readerThread = new Thread(new ReadThread());
-		readerThread.start();
-		Thread processThread = new Thread(new ProcessThread());
-		processThread.start();
+		mReadThread = new Thread(new ReadThread());
+		mReadThread.start();
+		mProcessThread = new Thread(new ProcessThread());
+		mProcessThread.start();
 		setUpTwitch();
+	}
+	
+	public void close() {
+		
+		try {
+			mChatSocket.close();
+		} catch (IOException exp) {
+			exp.printStackTrace();
+		}
+		
+		try {
+			mReadThread.interrupt();
+		} catch (SecurityException exp) {
+			exp.printStackTrace();
+		} 		
+
+		try {
+			mProcessThread.interrupt(); // condition variable await will unblock if thread is interrupted
+		} catch (SecurityException exp) {
+			exp.printStackTrace();
+		} 		
 	}
 
 	/**
@@ -198,6 +222,7 @@ public class TwitchSocket {
 						for (EmoteValue emote : mEmoteValues) {
 							if (emote.string().equals(countCall)) {
 								sendChatMessage(createUniqueMessage(emote.getCount() + " " + emote.string(), "... ;p"));
+								emote.incrementQueries();
 								return;
 							}
 						}

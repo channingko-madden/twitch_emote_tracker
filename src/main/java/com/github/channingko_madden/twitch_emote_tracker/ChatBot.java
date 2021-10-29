@@ -1,4 +1,4 @@
-package com.github.channingko_madden.twitch_kekw_chatbot;
+package com.github.channingko_madden.twitch_emote_tracker;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;

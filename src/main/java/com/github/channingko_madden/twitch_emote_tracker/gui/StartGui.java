@@ -1,4 +1,4 @@
-package com.github.channingko_madden.twitch_kekw_chatbot.gui;
+package com.github.channingko_madden.twitch_emote_tracker.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -11,8 +11,8 @@ import java.util.List;
 
 import javax.swing.*;
 
-import com.github.channingko_madden.twitch_kekw_chatbot.EmoteValue;
-import com.github.channingko_madden.twitch_kekw_chatbot.TwitchSocket;
+import com.github.channingko_madden.twitch_emote_tracker.EmoteValue;
+import com.github.channingko_madden.twitch_emote_tracker.TwitchSocket;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,9 +31,10 @@ import java.util.regex.Pattern;
 public class StartGui {
 	/** Regex pattern that matches valid Twitch usernames */
 	final private Pattern mUsernameRegexPattern = Pattern.compile("^[a-zA-Z0-9_]{4,25}$");
+	
+	/** JPanel that contains the Start GUI */
+	private JPanel mThePanel;
 
-	/** The main GUI frame */
-	private JFrame mTheFrame = new JFrame("Twitch emote bot");
 	/** Text field that contains the Twitch channel name to join */
 	private JTextField mChannelText;
 	/** Text field that user can write the Twitch emote to track */
@@ -51,27 +52,28 @@ public class StartGui {
 
 	/**
 	 * Default constructor
+	 * @param launchListener Listener to the GUI element that is used to signal the app to launch
 	 */
-	public StartGui() {
-		buildLaunchGui();
+	public StartGui(ActionListener launchListener) {
+		buildLaunchGui(launchListener);
 	}
 
 	/**
 	 * Build the User GUI.
 	 * 
 	 * GUI uses a BorderLayout to organize the components of the GUI
+	 * @param launchListener Listener to the GUI element that is used to signal the app to launch
 	 */
-	private void buildLaunchGui() {
-		mTheFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		JPanel background = new JPanel(new BorderLayout());
+	private void buildLaunchGui(ActionListener launchListener) {
+		mThePanel = new JPanel(new BorderLayout());
 		// empty border gives a margin between edges of the panel and where the
 		// components are placed. Aka it looks nice.
-		background.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		mThePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 		// Text field for inputting the twitch channel to connect with
 		mChannelText = new JTextField("Twitch channel name", 25); // twitch channel name can be at max 25 characters
 		mChannelText.addActionListener(new ChannelNameChecker());
-		background.add(BorderLayout.NORTH, mChannelText);
+		mThePanel.add(BorderLayout.NORTH, mChannelText);
 
 		// Create Box with horizontally organized components for adding/removing emotes to track.
 		Box emoteChoiceBox = new Box(BoxLayout.X_AXIS);
@@ -104,7 +106,7 @@ public class StartGui {
 
 		emoteChoiceBox.add(mAddedEmotePane);
 
-		background.add(BorderLayout.CENTER, emoteChoiceBox);
+		mThePanel.add(BorderLayout.CENTER, emoteChoiceBox);
 
 		// Create Box with horizontally organized components for launching the twitch bot
 		Box launchBox = new Box(BoxLayout.X_AXIS);
@@ -124,15 +126,67 @@ public class StartGui {
 		launchBox.add(userAuthBox);
 
 		JButton launchButton = new JButton("Launch");
-		launchButton.addActionListener(new LaunchButtonListener());
+		launchButton.addActionListener(launchListener);
 		launchBox.add(launchButton);
 
-		background.add(BorderLayout.SOUTH, launchBox);
-
-		mTheFrame.getContentPane().add(background);
-		mTheFrame.setBounds(50, 50, 300, 300);
-		mTheFrame.pack();
-		mTheFrame.setVisible(true);
+		mThePanel.add(BorderLayout.SOUTH, launchBox);
+	}
+	
+	/**
+	 * Return a JPanel that contains the GUI, for displaying by the main class
+	 * @return JPanel with GUI set up
+	 */
+	public JPanel getPanel() {
+		return mThePanel;
+	}
+	
+	/**
+	 * Return a list of the emotes to track
+	 * @return List of emotes to track
+	 */
+	public List<EmoteValue> getTargetEmotes() {
+		String[] trackEmotes = mListData.toArray(new String[mListData.size()]);
+		EmoteValue[] emoteValues = new EmoteValue[trackEmotes.length];
+		for (int i = 0; i < emoteValues.length; i++) {
+			emoteValues[i] = new EmoteValue(trackEmotes[i]);
+		}
+		return Arrays.asList(emoteValues);
+	}
+	
+	/** 
+	 * Return the name of the Twitch Channel to join
+	 * @return Twitch Channel Name
+	 */
+	public String getChannelName() {
+		return mChannelText.getText();
+	}
+	
+	/**
+	 * Return the user's Twitch Account name
+	 * @return User's Twitch Account name
+	 */
+	public String getUserName() {
+		return mUserTwitchNicknameText.getText();
+	}
+	
+	/**
+	 * Return the user's OAuth token
+	 * @return User's OAuth token
+	 */
+	public String getOAuth() {
+		return mUserOAuthText.getText();
+	}
+	
+	/**
+	 * Return if the user has input data in the GUI correctly, and the app is ready to launch
+	 * @return True if app is launchable, false otherwise
+	 */
+	public boolean launchable() {
+		boolean launchable = validUsername(mChannelText);
+		launchable &= validUsername(mUserTwitchNicknameText);
+		launchable &= validOAuth(mUserOAuthText.getText());
+		launchable &= addedEmoteCheck();
+		return launchable;
 	}
 
 	/**
@@ -289,38 +343,6 @@ public class StartGui {
 
 	}
 
-	/**
-	 * This class listens to the "Launch" button. When pressed, the Twitch bot will
-	 * join the channel and begin tracking the emotes. The Running GUI is displayed
-	 * afterwards.
-	 * 
-	 * @author channing.ko-madden
-	 *
-	 */
-	private class LaunchButtonListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			boolean launchable = validUsername(mChannelText);
-			launchable &= validUsername(mUserTwitchNicknameText);
-			launchable &= validOAuth(mUserOAuthText.getText());
-			launchable &= addedEmoteCheck();
-
-			if (launchable) {
-				System.out.println("Launching twitch bot");
-				String[] trackEmotes = mListData.toArray(new String[mListData.size()]);
-				EmoteValue[] emoteValues = new EmoteValue[trackEmotes.length];
-				for (int i = 0; i < emoteValues.length; i++) {
-					emoteValues[i] = new EmoteValue(trackEmotes[i]);
-				}
-				final TwitchSocket testSocket = new TwitchSocket(
-						mChannelText.getText(),
-						mUserTwitchNicknameText.getText(),
-						mUserOAuthText.getText(),
-						Arrays.asList(emoteValues));
-			}
-		}
-	}
 
 	/**
 	 * This class checks when the new emote text field is edited. Currently used for
