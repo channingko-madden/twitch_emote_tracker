@@ -5,10 +5,36 @@
  * For more details take a look at the Java Libraries chapter in the Gradle
  * User Manual available at https://docs.gradle.org/6.3/userguide/java_library_plugin.html
  */
+ 
+version = '1.0.0'
 
-plugins {
-    // Apply the java-library plugin to add support for Java Library
-    id 'java-library'
+//plugins {
+ //   // Apply the java-library plugin to add support for Java Library
+//    id 'java-library'
+//}
+
+apply plugin: 'java-library' // introduces api for external dependencies
+apply plugin: 'eclipse'
+
+/*
+task makeJar(type: Jar) {
+	manifest {
+		attributes 'Implementation-Title': 'Twitch Emote Tracker',
+			'Implementation-Version':  version,
+			'Main-Class': 'com.github.channingko_madden.twitch_emote_tracker.HelloTwitch'
+	}
+	baseName = project.name + '-all'
+	from {configurations.compile.collect {it.isDirectory() ? it : zipTree(it) } }
+	with jar
+}
+*/
+jar {
+	manifest {
+		attributes 'Implementation-Title': 'Twitch Emote Tracker',
+			'Implementation-Version':  version,
+			'Main-Class': 'com.github.channingko_madden.twitch_emote_tracker.HelloTwitch'
+	}
+	from {configurations.compile.collect {it.isDirectory() ? it : zipTree(it) } }
 }
 
 repositories {
