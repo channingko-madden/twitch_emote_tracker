@@ -25,10 +25,10 @@ import java.util.concurrent.locks.ReentrantLock;
 public class TwitchSocket {
 
 	final private String server = "irc.chat.twitch.tv";
-	final private int port = 6667;
-	final private String mNickname;
-	final private String mToken;
-	final private String mChannelName;
+	final private int port = 6667; // twitch irc port
+	final private String mNickname; // User's twitch account name
+	final private String mToken; // Users' oauth token
+	final private String mChannelName; // Channel to join
 	private Socket mChatSocket;
 	private BufferedReader mChatReader;
 	private BufferedWriter mTwitchWriter; // Had success with buffered write, but don't know why
@@ -39,14 +39,16 @@ public class TwitchSocket {
 	/** Flag to flip when a unique chat message is created, so the next one created is also unique. */
 	private boolean mNeedUniqueMsg = false; 
 	
+	/** Thread that reads from Twitch IRC */
 	private Thread mReadThread;
+	/** Thread that process chat messages */
 	private Thread mProcessThread;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param channel_name Twitch channel to join (ex. t90official)
-	 * @param nickname     Your twich account name
+	 * @param nickname     Your twitch account name
 	 * @param token        OAUTH token for your twitch account
 	 * @param emotes The emotes the user wants to track
 	 */
@@ -63,6 +65,9 @@ public class TwitchSocket {
 		setUpTwitch();
 	}
 	
+	/**
+	 * Close socket connection to Twitch IRC and stop threads.
+	 */
 	public void close() {
 		
 		try {
@@ -117,7 +122,7 @@ public class TwitchSocket {
 	}
 
 	/**
-	 * Reads from the Twitch IRC and prints out the messages
+	 * Reads from the Twitch IRC, places messages to process in mMessageList, then notifies the process thread's condition
 	 */
 	private class ReadThread implements Runnable {
 
@@ -142,13 +147,11 @@ public class TwitchSocket {
 			} finally {
 				System.out.println("Read thread over");
 			}
-
 		}
-
 	}
 
 	/**
-	 * Extracts messages from the mMessageList and searches if it has KEKW in it.
+	 * Extracts messages from the mMessageList to process.
 	 * Waits on a condition variable until messages are within the mMessageList.
 	 */
 	private class ProcessThread implements Runnable {
@@ -188,12 +191,12 @@ public class TwitchSocket {
 	}
 
 	/**
-	 * Search for "KEKW" within a message body and increment the internal KEKW
-	 * counter if found
+	 * Search message for any tracked emote strings within a message body and extract statistic data to display to the user
 	 * 
 	 * Handles PING/PONG protocol
 	 * 
-	 * Handles the following commands "!kekws"
+	 * Handles the following commands:
+	 * - "!emotecount"
 	 * 
 	 * @param message Chat message from Twitch
 	 */

@@ -53,7 +53,7 @@ public class EmoteValue implements EmotePublisher {
 
 	
 	/**
-	 * @return Increment the number of queries for this emote that have occured
+	 * @return Increment the number of queries for this emote that have occurred and publish an emote event
 	 */
 	public void incrementQueries() {
 		mQueries++;
@@ -71,8 +71,10 @@ public class EmoteValue implements EmotePublisher {
 	
 	/**
 	 * Search the message for occurrences of the emote, and return if any occurrences are found.
+	 * Publishes an emote event if there emote occurences.
 	 * 
 	 * Uses REGEX Pattern to find the number of occurrences, and this number is added to the running count.
+	 * 
 	 * 
 	 * @param message
 	 * @return True if at least one occurrence of the emote is within the message, false otherwise

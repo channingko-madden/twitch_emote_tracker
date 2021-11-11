@@ -2,7 +2,8 @@ package com.github.channingko_madden.twitch_emote_tracker.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
@@ -12,7 +13,6 @@ import java.util.List;
 import javax.swing.*;
 
 import com.github.channingko_madden.twitch_emote_tracker.EmoteValue;
-import com.github.channingko_madden.twitch_emote_tracker.TwitchSocket;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -75,14 +75,22 @@ public class StartGui {
 		mChannelText.addActionListener(new ChannelNameChecker());
 		mThePanel.add(BorderLayout.NORTH, mChannelText);
 
-		// Create Box with horizontally organized components for adding/removing emotes to track.
-		Box emoteChoiceBox = new Box(BoxLayout.X_AXIS);
+		// Create JPanel with horizontally organized components for adding/removing emotes to track, to be in the center of the main panel
+		JPanel emoteChoiceBox = new JPanel(new GridBagLayout());
 		emoteChoiceBox.setBorder(null); // no border for this box
+		
 
 		mAddEmoteText = new JTextField(25);
 		mAddEmoteText.setText("Kappa");
 		mAddEmoteText.addActionListener(new NewEmoteTextListener());
-		emoteChoiceBox.add(mAddEmoteText);
+		// create constraint for each element of the emoteChoiceBox, they recommend not to reuse constraints
+		GridBagConstraints choiceConstraint = new GridBagConstraints();
+		choiceConstraint.gridx = 0;
+		choiceConstraint.gridy = 0;
+		choiceConstraint.gridheight = 3;
+		choiceConstraint.weightx = 0.4;
+		choiceConstraint.fill = GridBagConstraints.HORIZONTAL;
+		emoteChoiceBox.add(mAddEmoteText, choiceConstraint);
 
 		Box emoteButtonBox = new Box(BoxLayout.Y_AXIS); // organize add/remote buttons vertically
 
@@ -93,8 +101,14 @@ public class StartGui {
 		JButton removeButton = new JButton("Remove");
 		removeButton.addActionListener(new RemoveButtonListener());
 		emoteButtonBox.add(removeButton);
-
-		emoteChoiceBox.add(emoteButtonBox);
+		choiceConstraint = new GridBagConstraints();
+		choiceConstraint.gridx = 1;
+		choiceConstraint.gridy = 1;
+		choiceConstraint.gridheight = 3;
+		choiceConstraint.weightx = 0.2;
+		choiceConstraint.gridheight = 2;
+		choiceConstraint.fill = GridBagConstraints.NONE;
+		emoteChoiceBox.add(emoteButtonBox, choiceConstraint);
 
 		// Holds added emotes to track
 		mEmotesList = new JList<String>();
@@ -104,7 +118,14 @@ public class StartGui {
 		mAddedEmotePane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		mAddedEmotePane.setViewportBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
-		emoteChoiceBox.add(mAddedEmotePane);
+		choiceConstraint = new GridBagConstraints();
+		choiceConstraint.gridx = 2;
+		choiceConstraint.gridy = 0;
+		choiceConstraint.weightx = 0.4;
+		choiceConstraint.weighty = 1.0;
+		choiceConstraint.gridheight = 3;
+		choiceConstraint.fill = GridBagConstraints.BOTH;
+		emoteChoiceBox.add(mAddedEmotePane, choiceConstraint);
 
 		mThePanel.add(BorderLayout.CENTER, emoteChoiceBox);
 
@@ -154,7 +175,7 @@ public class StartGui {
 	}
 	
 	/** 
-	 * Return the name of the Twitch Channel to join
+	 * Return the name of the Twitch Channel to join (ex. ninja, liihs)
 	 * @return Twitch Channel Name
 	 */
 	public String getChannelName() {
@@ -170,7 +191,7 @@ public class StartGui {
 	}
 	
 	/**
-	 * Return the user's OAuth token
+	 * Return the user's OAuth token generated for their twitch account
 	 * @return User's OAuth token
 	 */
 	public String getOAuth() {

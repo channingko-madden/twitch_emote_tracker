@@ -11,13 +11,12 @@ import javax.swing.JPanel;
 import com.github.channingko_madden.twitch_emote_tracker.gui.RunningGui;
 import com.github.channingko_madden.twitch_emote_tracker.gui.StartGui;
 
-/*
+/**
  * Main class
  * 
- * Wants three arguments passed
- * 	1. Name of twitch channel you want to join (ex. ninja, liihs)
- *  2. Twitch account username to be used
- *  3. OAuth token generated for the twitch account
+ * Creates the app's JFrame and uses a CardLayout to display the different GUIs
+ * @author channing.ko-madden
+ *
  */
 public class HelloTwitch {
 
@@ -26,8 +25,6 @@ public class HelloTwitch {
 		System.out.println("Hello Twitch");
 
 		HelloTwitch gui = new HelloTwitch();
-		// StartGui gui = new StartGui();
-		// final TwitchSocket testSocket = new TwitchSocket(args[0], args[1], args[2]);
 	}
 	
 	/** The main GUI frame */
