@@ -29,7 +29,7 @@ java -jar twitch_emote_tracker-1.0.0.jar
 - To remove an emote, select it within the list of added emotes, and then press the *Remove* button.
 - You must enter your Twitch account nickname (which may differ from your Twitch channel name) and a valid OAuth
 token for your Twitch account in order to properly connect and join the chat.
-- Once all the fields are filled out, press the *Launch* button to launch the bot, and display the data table.
+- Once all the fields are filled out, press the *Launch* button to launch the bot.
 
 #### Help
 - Fields will indicate improper inputs by setting the text to red.
