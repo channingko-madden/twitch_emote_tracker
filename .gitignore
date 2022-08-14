@@ -6,6 +6,8 @@ build/
 
 
 *.class
+*.classpath
+.classpath
 *.jar
 *.aar
 *.war
