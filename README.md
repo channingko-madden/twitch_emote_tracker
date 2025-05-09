@@ -1,6 +1,6 @@
 # Twitch Emote Tracker
 Track statistics about emotes in the chat!
-Use your [Twitch](https://www.twitch.tv/) account and a valid [OAuth Password](https://twitchapps.com/tmi/) to connect with any stream as a chat bot and track emotes in chat.
+Use your [Twitch](https://www.twitch.tv/) account and a valid OAuth to connect with any stream as a chat bot and track emotes in chat.
 
 ![Twitch Emote Tracker Launch GUI](/docs/launch-display.png)
 
